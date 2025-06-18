@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login / Sign Up</title>
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial; background: linear-gradient(to right, #667eea, #764ba2); height: 100vh; display: flex; justify-content: center; align-items: center; }
+    .container { width: 350px; background: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); overflow: hidden; position: relative; }
+    .form-container { width: 200%; display: flex; transition: transform 0.5s ease-in-out; }
+    form { width: 50%; padding: 30px; box-sizing: border-box; }
+    h2 { text-align: center; margin-bottom: 20px; }
+    input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background-color: #5a67d8; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer; }
+    .toggle-btn { text-align: center; margin-top: 15px; color: #333; cursor: pointer; }
+    #message { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; display: none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="message"></div>
+
+  <div class="form-container" id="formContainer">
+    
+    <!-- Login Form -->
+    <form id="loginForm">
+      <h2>Login</h2>
+      <input type="text" name="username" placeholder="Enter Username" required />
+      <input type="password" name="password" placeholder="Enter Password" required />
+      <button type="submit">Login</button>
+      <div class="toggle-btn" onclick="toggleForm()">Don't have an account? Sign Up</div>
+    </form>
+    
+    <!-- Sign Up Form -->
+    <form id="signupForm">
+      <h2>Sign Up</h2>
+      <input type="text" name="username" placeholder="Choose Username" required />
+      <input type="password" name="password" placeholder="Choose Password" required />
+      <button type="submit">Register</button>
+      <div class="toggle-btn" onclick="toggleForm()">Already have an account? Login</div>
+    </form>
+    
+  </div>
+</div>
+
+<script>
+  function toggleForm() {
+    const formContainer = document.getElementById('formContainer');
+    formContainer.style.transform = formContainer.style.transform === 'translateX(-50%)'
+      ? 'translateX(0)' : 'translateX(-50%)';
+  }
+
+  document.getElementById("signupForm").addEventListener("submit", async function(event){
+    event.preventDefault();
+    const username = this.username.value;
+    const password = this.password.value;
+
+    const res = await fetch("/signup", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const text = await res.text();
+    if (res.ok) {
+      showMessage("Account created successfully! Redirecting...");
+      setTimeout(()=> window.location.href = "/home", 2000);
+    } else {
+      showMessage(text);
+    }
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async function(event){
+    event.preventDefault();
+    const username = this.username.value;
+    const password = this.password.value;
+
+    const res = await fetch("/login", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const text = await res.text();
+    if (res.ok) {
+      window.location.href = "/home";
+    } else {
+      showMessage(text);
+    }
+  });
+
+  function showMessage(msg) {
+    const message = document.getElementById("message");
+    message.innerText = msg;
+    message.style.display = "block";
+  }
+</script>
+
+</body>
+</html>
